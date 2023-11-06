@@ -1,82 +1,59 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { nanoid } from 'nanoid';
 import PropTypes from 'prop-types';
 import ContactForm from '../ContactForm/ContactForm';
 import Filter from '../Filter/Filter';
 import ContactList from '../ContactList/ContactList';
-import styles from './app.module.css'
+import styles from './app.module.css';
 
-class App extends React.Component {
-  state = {
-    contacts: [
-      { id: 'id-1', name: 'Rosie Simpson', number: '459-12-56' },
-      { id: 'id-2', name: 'Hermione Kline', number: '443-89-12' },
-      { id: 'id-3', name: 'Eden Clements', number: '645-17-79' },
-      { id: 'id-4', name: 'Annie Copeland', number: '227-91-26' },
-    ],
-    filter: '',
-  };
+function App() {
+  const [contacts, setContacts] = useState(
+    () =>
+      JSON.parse(localStorage.getItem('contacts')) ?? [
+        { id: 'id-1', name: 'Rosie Simpson', number: '459-12-56' },
+        { id: 'id-2', name: 'Hermione Kline', number: '443-89-12' },
+        { id: 'id-3', name: 'Eden Clements', number: '645-17-79' },
+        { id: 'id-4', name: 'Annie Copeland', number: '227-91-26' },
+      ]
+  );
 
-  componentDidMount() {
-    const storedContacts = JSON.parse(localStorage.getItem('contacts'));
-    if (storedContacts) {
-      this.setState({ contacts: storedContacts });
-    }
-  }
+  const [filter, setFilter] = useState('');
 
-  componentDidUpdate() {
-    const { contacts } = this.state;
+  useEffect(() => {
     localStorage.setItem('contacts', JSON.stringify(contacts));
-  }
+  }, [contacts]);
 
-  addContact = (name, number) => {
-    if (this.isContactExist(name)) {
+  const addContact = (name, number) => {
+    if (isContactExist(name)) {
       alert(`"${name}" contact already exists in the phone book.`);
       return;
     }
 
     const newContact = { name, number, id: nanoid() };
-    this.setState((prevState) => ({
-      contacts: [...prevState.contacts, newContact],
-    }));
+    setContacts((prevContacts) => [...prevContacts, newContact]);
   };
 
-  deleteContact = (id) => {
-    this.setState((prevState) => ({
-      contacts: prevState.contacts.filter((contact) => contact.id !== id),
-    }));
+  const deleteContact = (id) => {
+    setContacts((prevContacts) => prevContacts.filter((contact) => contact.id !== id));
   };
 
-  isContactExist = (name) => {
-    return this.state.contacts.some((contact) => contact.name === name);
+  const isContactExist = (name) => {
+    return contacts.some((contact) => contact.name === name);
   };
 
-  handleFilterChange = (filter) => {
-    this.setState({ filter });
+  const handleFilterChange = (filter) => {
+    setFilter(filter);
   };
 
-  render() {
-    const { contacts, filter } = this.state;
-
-    return (
-      <div className={styles.container}>
-        <h1>Phonebook</h1>
-        <ContactForm
-          onAddContact={this.addContact}
-        />
-        <h2>Contacts</h2>
-        <Filter
-          value={filter}
-          onChangeFilter={this.handleFilterChange}
-        />
-        <ContactList
-          contacts={contacts}
-          filter={filter}
-          onDeleteContact={this.deleteContact}
-        />
-      </div>
-    );
-  }
+  return (
+    <div className={styles.container}>
+      <h1>Phonebook</h1>
+      <ContactForm onAddContact={addContact} />
+      <h2>Contacts</h2>
+      <Filter value={filter} onChangeFilter={handleFilterChange} />
+      <ContactList contacts={contacts} filter={filter} onDeleteContact={deleteContact} />
+    </div>
+  );
 }
 
 App.propTypes = {

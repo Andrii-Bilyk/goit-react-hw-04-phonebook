@@ -1,49 +1,48 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import styles from './contact-form.module.css'
+import styles from './contact-form.module.css';
 
-class ContactForm extends React.Component {
-  state = {
-    name: '',
-    number: '',
+function ContactForm({ onAddContact }) {
+  const [name, setName] = useState('');
+  const [number, setNumber] = useState('');
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    if (name === 'name') {
+      setName(value);
+    } else if (name === 'number') {
+      setNumber(value);
+    }
   };
 
-  handleChange = (e) => {
-    this.setState({ [e.target.name]: e.target.value });
-  };
-
-  handleSubmit = (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    const { name, number } = this.state;
-    this.props.onAddContact(name, number);
-    this.setState({ name: '', number: '' });
+    onAddContact(name, number);
+    setName('');
+    setNumber('');
   };
 
-  render() {
-    const { name, number } = this.state;
-
-    return (
-      <form className={styles.form} onSubmit={this.handleSubmit}>
-        <span>Name</span>
-        <input
-          type="text"
-          name="name"
-          required
-          value={name}
-          onChange={this.handleChange}
-        />
-        <span>Number tel:</span>
-        <input
-          type="tel"
-          name="number"
-          required
-          value={number}
-          onChange={this.handleChange}
-        />
-        <button className={styles.btn} type="submit">Add contact</button>
-      </form>
-    );
-  }
+  return (
+    <form className={styles.form} onSubmit={handleSubmit}>
+      <span>Name</span>
+      <input
+        type="text"
+        name="name"
+        required
+        value={name}
+        onChange={handleChange}
+      />
+      <span>Number tel:</span>
+      <input
+        type="tel"
+        name="number"
+        required
+        value={number}
+        onChange={handleChange}
+      />
+      <button className={styles.btn} type="submit">Add contact</button>
+    </form>
+  );
 }
 
 ContactForm.propTypes = {
