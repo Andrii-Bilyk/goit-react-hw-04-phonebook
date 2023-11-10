@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { nanoid } from 'nanoid';
-import PropTypes from 'prop-types';
 import ContactForm from '../ContactForm/ContactForm';
 import Filter from '../Filter/Filter';
 import ContactList from '../ContactList/ContactList';
@@ -25,7 +24,7 @@ function App() {
 
   const addContact = (name, number) => {
     if (isContactExist(name)) {
-      alert(`"${name}" contact already exists in the phone book.`);
+      alert(`"${name}" контакт вже існує в телефонній книзі.`);
       return;
     }
 
@@ -45,28 +44,19 @@ function App() {
     setFilter(filter);
   };
 
+  const filteredContacts = contacts.filter((contact) =>
+    contact.name.toLowerCase().includes(filter.toLowerCase())
+  );
+
   return (
     <div className={styles.container}>
-      <h1>Phonebook</h1>
+      <h1>Телефонна книга</h1>
       <ContactForm onAddContact={addContact} />
-      <h2>Contacts</h2>
+      <h2>Контакти</h2>
       <Filter value={filter} onChangeFilter={handleFilterChange} />
-      <ContactList contacts={contacts} filter={filter} onDeleteContact={deleteContact} />
+      <ContactList contacts={filteredContacts} onDeleteContact={deleteContact} />
     </div>
   );
 }
-
-App.propTypes = {
-  contacts: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-      number: PropTypes.string.isRequired,
-    })
-  ),
-  filter: PropTypes.string,
-  onAddContact: PropTypes.func.isRequired,
-  onDeleteContact: PropTypes.func.isRequired,
-};
 
 export default App;
